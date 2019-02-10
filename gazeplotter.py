@@ -71,11 +71,11 @@ COLS = {	"butter": [	'#fce94f',
 					'#555753',
 					'#2e3436'],
 		}
-# FONT
-FONT = {	'family': 'Ubuntu',
-		'size': 12}
+# # FONT
+# FONT = {'family': 'Windows',
+# 		'size': 15}
 
-matplotlib.rc('font', **FONT)
+# matplotlib.rc('font', **FONT)
 
 
 
@@ -84,20 +84,20 @@ matplotlib.rc('font', **FONT)
 # FUNCTIONS NEW
 
 def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, durationcolour=True, alpha=0.5, savefilename=None):
-	
+
 	"""Draws circles on the fixation locations, optionally on top of an image,
 	with optional weigthing of the duration for circle size and colour
-	
+
 	arguments
-	
+
 	fixations		-	a list of fixation ending events from a single trial,
 					as produced by edfreader.read_edf, e.g.
 					edfdata[trialnr]['events']['Efix']
 	dispsize		-	tuple or list indicating the size of the display,
 					e.g. (1024,768)
-	
+
 	keyword arguments
-	
+
 	imagefile		-	full path to an image file over which the heatmap
 					is to be laid, or None for no image; NOTE: the image
 					may be smaller than the display size, the function
@@ -114,16 +114,16 @@ def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, duratio
 					is completely untransparant (default = 0.5)
 	savefilename	-	full path to the file in which the heatmap should be
 					saved, or None to not save the file (default = None)
-	
+
 	returns
-	
+
 	fig			-	a matplotlib.pyplot Figure instance, containing the
 					fixations
 	"""
 
 	# FIXATIONS
 	# fix = parse_fixations(fixations)
-	
+
 	# IMAGE
 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -137,19 +137,21 @@ def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, duratio
 		col = fix['dur']
 	else:
 		col = COLS['chameleon'][2]
-	# draw circles	
+	# draw circles
 	ax.scatter(fix['x'],fix['y'], s=siz, c=col, marker='o', cmap='jet', alpha=alpha, zorder=2 )
+	for i, txt in enumerate( range(0, len(fix['x']) )):
+		ax.annotate(txt, xy= (fix['x'][i], fix['y'][i]), ha='center')
 	pyplot.plot(fix['x'],fix['y'], lw=2, zorder=1)
-	
-	ax.set_axis_bgcolor("lightslategray")
-	
+
+	# ax.set_axis_bgcolor("lightslategray")
+
 	# FINISH PLOT
 	# invert the y axis, as (0,0) is top left on a display
 	ax.invert_yaxis()
 	# save the figure if a file name was provided
 	if savefilename != None:
 		fig.savefig(savefilename) #, transparent=True, edgecolor=None)
-	
+
 	return fig
 
 
@@ -157,21 +159,21 @@ def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, duratio
 # FUNCTIONS NEW
 
 def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0.5, savefilename=None):
-	
+
 	"""Draws a heatmap of the provided fixations, optionally drawn over an
 	image, and optionally allocating more weight to fixations with a higher
 	duration.
-	
+
 	arguments
-	
+
 	fixations		-	a list of fixation ending events from a single trial,
 					as produced by edfreader.read_edf, e.g.
 					edfdata[trialnr]['events']['Efix']
 	dispsize		-	tuple or list indicating the size of the display,
 					e.g. (1024,768)
-	
+
 	keyword arguments
-	
+
 	imagefile		-	full path to an image file over which the heatmap
 					is to be laid, or None for no image; NOTE: the image
 					may be smaller than the display size, the function
@@ -185,16 +187,16 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 					is completely untransparant (default = 0.5)
 	savefilename	-	full path to the file in which the heatmap should be
 					saved, or None to not save the file (default = None)
-	
+
 	returns
-	
+
 	fig			-	a matplotlib.pyplot Figure instance, containing the
 					heatmap
 	"""
 
 	# FIXATIONS
 	# fix = parse_fixations(fixations)
-	
+
 	# IMAGE
 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -233,7 +235,7 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 			except:
 				# fixation was probably outside of display
 				pass
-		else:				
+		else:
 			# add Gaussian to the current heatmap
 			heatmap[y:y+gwh,x:x+gwh] += gaus * fix['dur'][i]
 	# resize heatmap
@@ -250,7 +252,7 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 	# save the figure if a file name was provided
 	if savefilename != None:
 		fig.savefig(savefilename) #, facecolor='w', edgecolor=None)
-	
+
 	return fig
 
 
@@ -259,30 +261,30 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 # HELPER FUNCTIONS
 
 def draw_display(dispsize, imagefile=None):
-	
+
 	"""Returns a matplotlib.pyplot Figure and its axes, with a size of
 	dispsize, a black background colour, and optionally with an image drawn
 	onto it
-	
+
 	arguments
-	
+
 	dispsize		-	tuple or list indicating the size of the display,
 					e.g. (1024,768)
-	
+
 	keyword arguments
-	
+
 	imagefile		-	full path to an image file over which the heatmap
 					is to be laid, or None for no image; NOTE: the image
 					may be smaller than the display size, the function
 					assumes that the image was presented at the centre of
 					the display (default = None)
-	
+
 	returns
 	fig, ax		-	matplotlib.pyplot Figure and its axes: field of zeros
 					with a size of dispsize, and an image drawn onto it
 					if an imagefile was passed
 	"""
-	
+
 	# construct screen (black background)
 	screen = numpy.zeros((dispsize[1],dispsize[0],3), dtype='uint8')
 	# if an image location has been passed, draw the image
@@ -302,10 +304,10 @@ def draw_display(dispsize, imagefile=None):
 		# width and height of the image
 		w, h = int(len(img[0])), int(len(img))
 		# x and y position of the image on the display
-		x = int(dispsize[0]/2 - w/2) 
-		y = int(dispsize[1]/2 - h/2) 
+		x = int(dispsize[0]/2 - w/2)
+		y = int(dispsize[1]/2 - h/2)
 		# draw the image on the screen
-		
+
 		# screen[y:y+h,x:x+w,:] += img
 		numpy.add(screen[y:y+h,x:x+w,:], img, out=screen[y:y+h,x:x+w,:], casting="unsafe")
 	# dots per inch
@@ -320,30 +322,30 @@ def draw_display(dispsize, imagefile=None):
 	# plot display
 	ax.axis([0,dispsize[0],0,dispsize[1]])
 	ax.imshow(screen)#, origin='upper')
-	
+
 	return fig, ax
 
 
 def gaussian(x, sx, y=None, sy=None):
-	
+
 	"""Returns an array of numpy arrays (a matrix) containing values between
 	1 and 0 in a 2D Gaussian distribution
-	
+
 	arguments
 	x		-- width in pixels
 	sx		-- width standard deviation
-	
+
 	keyword argments
 	y		-- height in pixels (default = x)
 	sy		-- height standard deviation (default = sx)
 	"""
-	
+
 	# square Gaussian if only x values are passed
 	if y == None:
 		y = x
 	if sy == None:
 		sy = sx
-	# centers	
+	# centers
 	xo = x/2
 	yo = y/2
 	# matrix of zeros
@@ -357,21 +359,21 @@ def gaussian(x, sx, y=None, sy=None):
 
 
 # def parse_fixations(fixations):
-	
+
 # 	"""Returns all relevant data from a list of fixation ending events
-	
+
 # 	arguments
-	
+
 # 	fixations		-	a list of fixation ending events from a single trial,
 # 					as produced by edfreader.read_edf, e.g.
 # 					edfdata[trialnr]['events']['Efix']
 # 	returns
-	
+
 # 	fix		-	a dict with three keys: 'x', 'y', and 'dur' (each contain
 # 				a numpy array) for the x and y coordinates and duration of
 # 				each fixation
 # 	"""
-	
+
 # 	# empty arrays to contain fixation coordinates
 # 	fix = {	'x':numpy.zeros(len(fixations)),
 # 			'y':numpy.zeros(len(fixations)),
@@ -382,7 +384,7 @@ def gaussian(x, sx, y=None, sy=None):
 # 		fix['x'][fixnr] = ex
 # 		fix['y'][fixnr] = ey
 # 		fix['dur'][fixnr] = dur
-	
+
 # 	return fix
 
 
@@ -391,20 +393,20 @@ def gaussian(x, sx, y=None, sy=None):
 # FUNCTIONS
 
 # def draw_fixations(fixations, dispsize, imagefile=None, durationsize=True, durationcolour=True, alpha=0.5, savefilename=None):
-	
+
 # 	"""Draws circles on the fixation locations, optionally on top of an image,
 # 	with optional weigthing of the duration for circle size and colour
-	
+
 # 	arguments
-	
+
 # 	fixations		-	a list of fixation ending events from a single trial,
 # 					as produced by edfreader.read_edf, e.g.
 # 					edfdata[trialnr]['events']['Efix']
 # 	dispsize		-	tuple or list indicating the size of the display,
 # 					e.g. (1024,768)
-	
+
 # 	keyword arguments
-	
+
 # 	imagefile		-	full path to an image file over which the heatmap
 # 					is to be laid, or None for no image; NOTE: the image
 # 					may be smaller than the display size, the function
@@ -421,16 +423,16 @@ def gaussian(x, sx, y=None, sy=None):
 # 					is completely untransparant (default = 0.5)
 # 	savefilename	-	full path to the file in which the heatmap should be
 # 					saved, or None to not save the file (default = None)
-	
+
 # 	returns
-	
+
 # 	fig			-	a matplotlib.pyplot Figure instance, containing the
 # 					fixations
 # 	"""
 
 # 	# FIXATIONS
 # 	fix = parse_fixations(fixations)
-	
+
 # 	# IMAGE
 # 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -453,26 +455,26 @@ def gaussian(x, sx, y=None, sy=None):
 # 	# save the figure if a file name was provided
 # 	if savefilename != None:
 # 		fig.savefig(savefilename)
-	
+
 # 	return fig
 
 
 # def draw_heatmap(fixations, dispsize, imagefile=None, durationweight=True, alpha=0.5, savefilename=None):
-	
+
 # 	"""Draws a heatmap of the provided fixations, optionally drawn over an
 # 	image, and optionally allocating more weight to fixations with a higher
 # 	duration.
-	
+
 # 	arguments
-	
+
 # 	fixations		-	a list of fixation ending events from a single trial,
 # 					as produced by edfreader.read_edf, e.g.
 # 					edfdata[trialnr]['events']['Efix']
 # 	dispsize		-	tuple or list indicating the size of the display,
 # 					e.g. (1024,768)
-	
+
 # 	keyword arguments
-	
+
 # 	imagefile		-	full path to an image file over which the heatmap
 # 					is to be laid, or None for no image; NOTE: the image
 # 					may be smaller than the display size, the function
@@ -486,16 +488,16 @@ def gaussian(x, sx, y=None, sy=None):
 # 					is completely untransparant (default = 0.5)
 # 	savefilename	-	full path to the file in which the heatmap should be
 # 					saved, or None to not save the file (default = None)
-	
+
 # 	returns
-	
+
 # 	fig			-	a matplotlib.pyplot Figure instance, containing the
 # 					heatmap
 # 	"""
 
 # 	# FIXATIONS
 # 	fix = parse_fixations(fixations)
-	
+
 # 	# IMAGE
 # 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -533,7 +535,7 @@ def gaussian(x, sx, y=None, sy=None):
 # 			except:
 # 				# fixation was probably outside of display
 # 				pass
-# 		else:				
+# 		else:
 # 			# add Gaussian to the current heatmap
 # 			heatmap[y:y+gwh,x:x+gwh] += gaus * fix['dur'][i]
 # 	# resize heatmap
@@ -550,25 +552,25 @@ def gaussian(x, sx, y=None, sy=None):
 # 	# save the figure if a file name was provided
 # 	if savefilename != None:
 # 		fig.savefig(savefilename)
-	
+
 # 	return fig
 
 
 # def draw_raw(x, y, dispsize, imagefile=None, savefilename=None):
-	
+
 # 	"""Draws the raw x and y data
-	
+
 # 	arguments
-	
+
 # 	x			-	a list of x coordinates of all samples that are to
 # 					be plotted
 # 	y			-	a list of y coordinates of all samples that are to
 # 					be plotted
 # 	dispsize		-	tuple or list indicating the size of the display,
 # 					e.g. (1024,768)
-	
+
 # 	keyword arguments
-	
+
 # 	imagefile		-	full path to an image file over which the heatmap
 # 					is to be laid, or None for no image; NOTE: the image
 # 					may be smaller than the display size, the function
@@ -576,13 +578,13 @@ def gaussian(x, sx, y=None, sy=None):
 # 					the display (default = None)
 # 	savefilename	-	full path to the file in which the heatmap should be
 # 					saved, or None to not save the file (default = None)
-	
+
 # 	returns
-	
+
 # 	fig			-	a matplotlib.pyplot Figure instance, containing the
 # 					fixations
 # 	"""
-	
+
 # 	# image
 # 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -594,16 +596,16 @@ def gaussian(x, sx, y=None, sy=None):
 # 	# save the figure if a file name was provided
 # 	if savefilename != None:
 # 		fig.savefig(savefilename)
-	
+
 # 	return fig
 
 
 # def draw_scanpath(fixations, saccades, dispsize, imagefile=None, alpha=0.5, savefilename=None):
-	
+
 # 	"""Draws a scanpath: a series of arrows between numbered fixations,
 # 	optionally drawn over an image
 # 	arguments
-	
+
 # 	fixations		-	a list of fixation ending events from a single trial,
 # 					as produced by edfreader.read_edf, e.g.
 # 					edfdata[trialnr]['events']['Efix']
@@ -612,9 +614,9 @@ def gaussian(x, sx, y=None, sy=None):
 # 					edfdata[trialnr]['events']['Esac']
 # 	dispsize		-	tuple or list indicating the size of the display,
 # 					e.g. (1024,768)
-	
+
 # 	keyword arguments
-	
+
 # 	imagefile		-	full path to an image file over which the heatmap
 # 					is to be laid, or None for no image; NOTE: the image
 # 					may be smaller than the display size, the function
@@ -625,13 +627,13 @@ def gaussian(x, sx, y=None, sy=None):
 # 					is completely untransparant (default = 0.5)
 # 	savefilename	-	full path to the file in which the heatmap should be
 # 					saved, or None to not save the file (default = None)
-	
+
 # 	returns
-	
+
 # 	fig			-	a matplotlib.pyplot Figure instance, containing the
 # 					heatmap
 # 	"""
-	
+
 # 	# image
 # 	fig, ax = draw_display(dispsize, imagefile=imagefile)
 
@@ -656,5 +658,5 @@ def gaussian(x, sx, y=None, sy=None):
 # 	# save the figure if a file name was provided
 # 	if savefilename != None:
 # 		fig.savefig(savefilename)
-	
+
 # 	return fig
