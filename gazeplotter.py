@@ -286,7 +286,7 @@ def draw_display(dispsize, imagefile=None):
 	"""
 
 	# construct screen (black background)
-	screen = numpy.zeros((dispsize[1],dispsize[0],3), dtype='uint8')
+	screen = numpy.zeros((dispsize[1],dispsize[0],3), dtype='float32')
 	# if an image location has been passed, draw the image
 	if imagefile != None:
 		# check if the path to the image exists
@@ -303,13 +303,19 @@ def draw_display(dispsize, imagefile=None):
 			img = numpy.flipud(img)
 		# width and height of the image
 		w, h = int(len(img[0])), int(len(img))
+		print(w, h)
 		# x and y position of the image on the display
 		x = int(dispsize[0]/2 - w/2)
 		y = int(dispsize[1]/2 - h/2)
 		# draw the image on the screen
-
+		print(img)
+		print(screen[y:y+h,x:x+w,:])
 		# screen[y:y+h,x:x+w,:] += img
-		numpy.add(screen[y:y+h,x:x+w,:], img, out=screen[y:y+h,x:x+w,:], casting="unsafe")
+		numpy.add(screen[y:y+h,x:x+w,:], img, out=screen[y:y+h,x:x+w,:] , casting="unsafe")
+		print(img)
+		print(screen[y:y+h,x:x+w,:])
+		print(numpy.array_equal(img, screen[y:y+h,x:x+w,:]))
+
 	# dots per inch
 	dpi = 100.0
 	# determine the figure size in inches

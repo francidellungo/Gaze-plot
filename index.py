@@ -131,5 +131,5 @@ fix = {	'x'  :numpy.asarray([ int((float(x[0][0]) + float(x[1][0]))/2) for x in 
 
 print(fix)
 
-fig = draw_fixations_new(fix, (2000, 2000), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao.png")
+fig = draw_fixations_new(fix, (800, 800), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao.png")
 # draw_heatmap_new(fix,  (2000, 2000))
