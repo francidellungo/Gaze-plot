@@ -129,7 +129,7 @@ fix = {	'x'  :numpy.asarray([ int((float(x[0][0]) + float(x[1][0]))/2) for x in 
         'y'  :numpy.asarray([ int((float(x[0][1]) + float(x[1][1]))/2) for x in photo_0]),
         'dur':numpy.asarray([ float(x[2][2].split(":")[-1])*1500 for x in photo_0 ])}
 
-print(fix)
+# print(fix)
 
-fig = draw_fixations_new(fix, (800, 800), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao.png")
-# draw_heatmap_new(fix,  (2000, 2000))
+draw_fixations_new(fix, (800, 800), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao_fix.png")
+draw_heatmap_new(fix, (800, 800), imagefile="base.png",  durationweight=True, alpha=1, savefilename="ciao_heat.png")

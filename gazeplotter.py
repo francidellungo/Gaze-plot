@@ -206,7 +206,7 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 	gsdwh = gwh/6
 	gaus = gaussian(gwh,gsdwh)
 	# matrix of zeroes
-	strt = gwh/2
+	strt = int(gwh/2)
 	heatmapsize = int(dispsize[1] + 2*strt), int(dispsize[0] + 2*strt)
 	# print(list(heatmapsize))
 	heatmap = numpy.zeros(heatmapsize, dtype=float)
@@ -223,12 +223,12 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 				hadj[0] = abs(x)
 				x = 0
 			elif dispsize[0] < x:
-				hadj[1] = gwh - int(x-dispsize[0])
+				hadj[1] = int(gwh - int(x-dispsize[0]))
 			if 0 > y:
 				vadj[0] = abs(y)
 				y = 0
 			elif dispsize[1] < y:
-				vadj[1] = gwh - int(y-dispsize[1])
+				vadj[1] = int(gwh - int(y-dispsize[1]))
 			# add adjusted Gaussian to the current heatmap
 			try:
 				heatmap[y:y+vadj[1],x:x+hadj[1]] += gaus[vadj[0]:vadj[1],hadj[0]:hadj[1]] * fix['dur'][i]
@@ -303,18 +303,18 @@ def draw_display(dispsize, imagefile=None):
 			img = numpy.flipud(img)
 		# width and height of the image
 		w, h = int(len(img[0])), int(len(img))
-		print(w, h)
+		# print(w, h)
 		# x and y position of the image on the display
 		x = int(dispsize[0]/2 - w/2)
 		y = int(dispsize[1]/2 - h/2)
 		# draw the image on the screen
-		print(img)
-		print(screen[y:y+h,x:x+w,:])
+		# print(img)
+		# print(screen[y:y+h,x:x+w,:])
 		# screen[y:y+h,x:x+w,:] += img
 		numpy.add(screen[y:y+h,x:x+w,:], img, out=screen[y:y+h,x:x+w,:] , casting="unsafe")
-		print(img)
-		print(screen[y:y+h,x:x+w,:])
-		print(numpy.array_equal(img, screen[y:y+h,x:x+w,:]))
+		# print(img)
+		# print(screen[y:y+h,x:x+w,:])
+		# print(numpy.array_equal(img, screen[y:y+h,x:x+w,:]))
 
 	# dots per inch
 	dpi = 100.0
