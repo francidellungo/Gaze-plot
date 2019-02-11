@@ -3,29 +3,32 @@ from gazeplotter import *
 import time
 
 
-def one(fix, x, y, t):
-    fix.append([x, y, t])
+def FS(fix, x, y, t):
+    fix.append([x, y, 0])
     return fix, True
  
-def two(fix, x, y, t):
+def DF(fix, x, y, t):
+    print(fix)
+    fix[0][2] = fix[0][2] + 1
     return fix, True
+
+def FE(fix, x, y, t):
+     fix.append([x, y, None])
+     return fix, True
  
-# def three(fix, x, y, t):
-#     return "March"
- 
-def four(fix, x, y, t):
-    fix.append([x, y, t])
+def TIME(fix, x, y, t):
+    #fix.append([x, y, t])
     return fix, False
 
 def photo(fix, x, y, t):
     return fix, None
 
-def switch_tipe(fix, row):
+def switch_type(fix, row):
     switcher = {
-        "FS"   : one,
-        "DF"   : two,
-        "FE"   : one,
-        "TIME" : four
+        "FS"   : FS,
+        "DF"   : DF,
+        "FE"   : FE,
+        "TIME" : TIME
     }
     tipe, x, y, t = row
     # Get the function from switcher dictionary
@@ -56,26 +59,58 @@ def switch_tipe(fix, row):
             .     : [  .  ]    
     ]
 """
+#fine fix, fixation -> inizializzo nuovo fix, fixation
+def finalize_photo(fix, fixations, photos):
+    print('end fixation')
+    fixations.append(fix)
+    photos.append(fixations)
+    fixations = []
+    fix       = []
+    return  fix, fixations, photos
 
 photos = []
 with open('fixationStream.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
-
     fixations = []
     fix       = []
+    prev_row = next(csv_reader)
     for row in csv_reader:
-        fix, end = switch_tipe(fix, row)
+        fix, end = switch_type(fix, row)
         # PHOTO_ occures
         if(end == None):
-            fixations.append(fix)
-            photos.append(fixations)
-            fixations = []
-            fix       = []
+            print(len(fix))
+            if len(fix) == 0:
+                fix, fixations, photos = finalize_photo(fix, fixations, photos)
+                print('chiusura normale')
+            #forse cnsiderare in modo diverso se c'è solo FS o se ci sono sia FS che FE, ma non TIME
+            elif len(fix) == 2:
+                fix.append(['-', '-', False])
+                fix, fixations, photos = finalize_photo(fix, fixations, photos)
+                #inizializzo nuovo fix (come se avessi letto un FS)
+                fix.append([prev_row[1], prev_row[2], 0])
+            elif len(fix) == 1:
+                fix.append([prev_row[1], prev_row[2], '-'])
+                fix.append(['-', '-', False])
+                fix, fixations, photos = finalize_photo(fix, fixations, photos)
+                next_row = next(csv_reader)
+                fix.append([next_row[1], next_row[2], 0])
+            
 
         # TIME occures
         elif(not end):
+            if len(fixations)>=1 and fixations[-1][2][2] is False:
+                final_time = row[3]
+                count_1 = fixations[-1][0][2]
+                count_2 = fix[0][2]
+                fixations[-1][2][3] == final_time*count_1/(count_1+count_2)
+                fix.append(['-','-', final_time*count_2/(count_1+count_2)])
+            else:
+                fix.append(['-','-', row[3]])
+
             fixations.append(fix)
             fix = []
+        
+        prev_row = row
         
 # print(photos)
 photo_0 = [
@@ -125,11 +160,11 @@ photo_0 = [
 #     'y'  :numpy.asarray([ (float(x[0][1]) + float(x[1][1]))/2 for x in photo]),
 #     'dur':numpy.asarray([ x[2][2] for x in photo ])}  for photo in photos]
 
-fix = {	'x'  :numpy.asarray([ int((float(x[0][0]) + float(x[1][0]))/2) for x in photo_0]),
+photo_0 = {	'x'  :numpy.asarray([ int((float(x[0][0]) + float(x[1][0]))/2) for x in photo_0]),
         'y'  :numpy.asarray([ int((float(x[0][1]) + float(x[1][1]))/2) for x in photo_0]),
         'dur':numpy.asarray([ float(x[2][2].split(":")[-1])*1500 for x in photo_0 ])}
 
 # print(fix)
 
-draw_fixations_new(fix, (800, 800), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao_fix.png")
-draw_heatmap_new(fix, (800, 800), imagefile="base.png",  durationweight=True, alpha=1, savefilename="ciao_heat.png")
+draw_fixations_new(photo_0, (800, 800), imagefile="base.png", durationsize=True, durationcolour=True, alpha=1, savefilename="ciao_fix.png")
+draw_heatmap_new(photo_0, (800, 800), imagefile="base.png",  durationweight=True, alpha=1, savefilename="ciao_heat.png")
