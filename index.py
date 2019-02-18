@@ -80,9 +80,10 @@ with open('fixationStream.csv') as csv_file:
         if(end == None):
             print(len(fix))
             if len(fix) == 0:
+                print('len di fix == 0')
                 fix, fixations, photos = finalize_photo(fix, fixations, photos)
                 print('chiusura normale')
-            #forse cnsiderare in modo diverso se c'è solo FS o se ci sono sia FS che FE, ma non TIME
+            #forse considerare in modo diverso se c'è solo FS o se ci sono sia FS che FE, ma non TIME
             elif len(fix) == 2:
                 fix.append(['-', '-', False])
                 fix, fixations, photos = finalize_photo(fix, fixations, photos)
