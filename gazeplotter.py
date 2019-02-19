@@ -143,10 +143,10 @@ def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, duratio
 	else:
 		col = COLS['chameleon'][2]
 	# draw circles
-	ax.scatter(1366-fix['x'], 300+fix['y'], s=siz, c=col, marker='o', cmap='jet', alpha=alpha, zorder=2 )
+	ax.scatter(fix['x'], fix['y'], s=siz, c=col, marker='o', cmap='jet', alpha=alpha, zorder=2 )
 	for i, txt in enumerate( range(0, len(fix['x']) )):
-		ax.annotate(txt, xy= (1366-fix['x'][i], 300+fix['y'][i]), ha='center')
-	pyplot.plot(1366-fix['x'],300+fix['y'], lw=2, zorder=1)
+		ax.annotate(txt, xy= (fix['x'][i], fix['y'][i]), ha='center')
+	pyplot.plot(fix['x'],fix['y'], lw=2, zorder=1)
 
 	# ax.set_axis_bgcolor("lightslategray")
 
@@ -156,7 +156,7 @@ def draw_fixations_new(fix, dispsize, imagefile=None, durationsize=True, duratio
 	# save the figure if a file name was provided
 	if savefilename != None:
 		fig.savefig(savefilename) #, transparent=True, edgecolor=None)
-	pyplot.show()
+	# pyplot.show()
 	
 	return fig
 
@@ -219,7 +219,7 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 	# create heatmap
 	for i in range(0,len(fix['dur'])):
 		# get x and y coordinates
-		x = int(strt + 1366-fix['x'][i] - int(gwh/2))
+		x = int(strt + fix['x'][i] - int(gwh/2))
 		y = int(strt + fix['y'][i] - int(gwh/2))
 		# correct Gaussian size if either coordinate falls outside of
 		# display boundaries
@@ -258,8 +258,8 @@ def draw_heatmap_new(fix, dispsize, imagefile=None, durationweight=True, alpha=0
 	# save the figure if a file name was provided
 	if savefilename != None:
 		fig.savefig(savefilename) #, facecolor='w', edgecolor=None)
-	fig.show()
-	pyplot.waitforbuttonpress()
+	# fig.show()
+	# pyplot.waitforbuttonpress()
 	return fig
 
 
